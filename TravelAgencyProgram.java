@@ -1,92 +1,182 @@
+import java.util.Scanner;
 import java.util.Vector;
 
 class Reservation {
-    private String reservationID;
-    private String reservationType;
-    private String details;
+    private String name;
+    private String destination;
 
-    public Reservation(String reservationID, String reservationType, String details) {
-        this.reservationID = reservationID;
-        this.reservationType = reservationType;
-        this.details = details;
+    public Reservation(String name, String destination) {
+        this.name = name;
+        this.destination = destination;
     }
 
-    public String getReservationID() {
-        return reservationID;
+    public String getName() {
+        return name;
     }
 
-    public String getReservationType() {
-        return reservationType;
-    }
-
-    public String getDetails() {
-        return details;
+    public String getDestination() {
+        return destination;
     }
 
     @Override
     public String toString() {
-        return "Reservation ID: " + reservationID + ", Type: " + reservationType + ", Details: " + details;
+        return "Reservation: " + name + " to " + destination;
     }
 }
 
-class TravelAgency {
+class ReservationSystem {
     private Vector<Reservation> reservations;
+    private String[] availableDestinations = {"New York", "Paris", "London", "Los Angeles"};
+    private String[] availableHotels = {"Hotel A", "Hotel B", "Hotel C", "Hotel D"};
+    private boolean[] flightAvailability = {true, false, true, true}; // Available flights for each destination
+    private boolean[] hotelAvailability = {true, false, true, true}; // Available hotels for each destination
 
-    public TravelAgency() {
+    public ReservationSystem() {
         reservations = new Vector<>();
     }
 
-    public void searchFlights(String criteria) {
-        // Implement flight search logic here
-        System.out.println("Searching for flights with criteria: " + criteria);
-        // Add code to search and display flight results
+    public void searchFlight(String name, String destination) {
+        int index = findDestinationIndex(destination);
+        if (index != -1 && flightAvailability[index]) {
+            System.out.println("Flights available to " + destination + " for " + name);
+        } else {
+            System.out.println("No flights available to " + destination + " for " + name);
+        }
     }
 
-    public void searchHotels(String criteria) {
-        // Implement hotel search logic here
-        System.out.println("Searching for hotels with criteria: " + criteria);
-        // Add code to search and display hotel results
+    public void searchHotel(String name, String destination) {
+        int index = findDestinationIndex(destination);
+        if (index != -1 && hotelAvailability[index]) {
+            System.out.println("Hotels available in " + destination + " for " + name);
+        } else {
+            System.out.println("No hotels available in " + destination + " for " + name);
+        }
     }
 
-    public void bookReservation(String reservationID, String reservationType, String details) {
-        Reservation reservation = new Reservation(reservationID, reservationType, details);
-        reservations.add(reservation);
-        System.out.println("Reservation booked: " + reservation);
+    public void bookReservation(String name, String destination, boolean isHotel) {
+        int index = findDestinationIndex(destination);
+        if (index != -1) {
+            if (isHotel) {
+                if (hotelAvailability[index]) {
+                    System.out.println("Booking a hotel reservation in " + destination + " for " + name);
+                    Reservation reservation = new Reservation(name, destination);
+                    reservations.add(reservation);
+                    hotelAvailability[index] = false; // Mark the hotel as booked
+                } else {
+                    System.out.println("No hotels available in " + destination + " for " + name);
+                }
+            } else {
+                if (flightAvailability[index]) {
+                    System.out.println("Booking a flight reservation to " + destination + " for " + name);
+                    Reservation reservation = new Reservation(name, destination);
+                    reservations.add(reservation);
+                    flightAvailability[index] = false; // Mark the flight as booked
+                } else {
+                    System.out.println("No flights available to " + destination + " for " + name);
+                }
+            }
+        } else {
+            System.out.println("Invalid destination. Available destinations are: " + String.join(", ", availableDestinations));
+        }
     }
 
-    public void cancelReservation(String reservationID) {
+    public void cancelReservation(String name, String destination) {
+        Reservation toRemove = null;
         for (Reservation reservation : reservations) {
-            if (reservation.getReservationID().equals(reservationID)) {
-                reservations.remove(reservation);
-                System.out.println("Reservation canceled: " + reservation);
-                return;
+            if (reservation.getName().equals(name) && reservation.getDestination().equals(destination)) {
+                toRemove = reservation;
+                break;
             }
         }
-        System.out.println("Reservation not found with ID: " + reservationID);
+
+        if (toRemove != null) {
+            reservations.remove(toRemove);
+            int index = findDestinationIndex(destination);
+            if (index != -1) {
+                flightAvailability[index] = true; // Mark the flight as available
+                hotelAvailability[index] = true;  // Mark the hotel as available
+            }
+            System.out.println("Reservation canceled: " + toRemove);
+        } else {
+            System.out.println("Reservation not found for " + name + " to " + destination);
+        }
     }
 
-    public void displayReservations() {
-        System.out.println("All Reservations:");
-        for (Reservation reservation : reservations) {
-            System.out.println(reservation);
+    private int findDestinationIndex(String destination) {
+        for (int i = 0; i < availableDestinations.length; i++) {
+            if (availableDestinations[i].equalsIgnoreCase(destination)) {
+                return i;
+            }
         }
+        return -1; // Destination not found
     }
 }
 
 public class TravelAgencyProgram {
     public static void main(String[] args) {
-        TravelAgency travelAgency = new TravelAgency();
+        ReservationSystem reservationSystem = new ReservationSystem();
+        Scanner scanner = new Scanner(System.in);
 
-        travelAgency.searchFlights("New York to Los Angeles");
-        travelAgency.searchHotels("Los Angeles");
+        while (true) {
+            System.out.println("\nMenu:");
+            System.out.println("1. Search for Flights");
+            System.out.println("2. Search for Hotels");
+            System.out.println("3. Book a Flight Reservation");
+            System.out.println("4. Book a Hotel Reservation");
+            System.out.println("5. Cancel a Reservation");
+            System.out.println("6. Exit");
+            System.out.print("Enter your choice: ");
+            int choice = scanner.nextInt();
+            scanner.nextLine(); // Consume newline
 
-        travelAgency.bookReservation("R101", "Flight", "New York to Los Angeles, Date: 2023-11-01");
-        travelAgency.bookReservation("H201", "Hotel", "Hotel ABC, Los Angeles, Check-in: 2023-11-01, Check-out: 2023-11-05");
+            switch (choice) {
+                case 1:
+                    System.out.print("Enter your name: ");
+                    String name = scanner.nextLine();
+                    System.out.print("Enter destination: ");
+                    String destination = scanner.nextLine();
+                    reservationSystem.searchFlight(name, destination);
+                    break;
 
-        travelAgency.displayReservations();
+                case 2:
+                    System.out.print("Enter your name: ");
+                    name = scanner.nextLine();
+                    System.out.print("Enter destination: ");
+                    destination = scanner.nextLine();
+                    reservationSystem.searchHotel(name, destination);
+                    break;
 
-        travelAgency.cancelReservation("R101");
+                case 3:
+                    System.out.print("Enter your name: ");
+                    name = scanner.nextLine();
+                    System.out.print("Enter destination: ");
+                    destination = scanner.nextLine();
+                    reservationSystem.bookReservation(name, destination, false); // Book a flight
+                    break;
 
-        travelAgency.displayReservations();
+                case 4:
+                    System.out.print("Enter your name: ");
+                    name = scanner.nextLine();
+                    System.out.print("Enter destination: ");
+                    destination = scanner.nextLine();
+                    reservationSystem.bookReservation(name, destination, true); // Book a hotel
+                    break;
+
+                case 5:
+                    System.out.print("Enter your name: ");
+                    name = scanner.nextLine();
+                    System.out.print("Enter destination: ");
+                    destination = scanner.nextLine();
+                    reservationSystem.cancelReservation(name, destination);
+                    break;
+
+                case 6:
+                    scanner.close();
+                    System.exit(0);
+
+                default:
+                    System.out.println("Invalid choice. Please select a valid option.");
+            }
+        }
     }
 }
