@@ -39,7 +39,7 @@ class BloodDemo {
         
         System.out.println("Blood Type: " + defaultPatient.getBloodData());
         
-
+        
         // Testing the overloaded constructor
         
         Patient customPatient = new Patient(12345, 30, "B+");

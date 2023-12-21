@@ -7,8 +7,14 @@ class Employee {
     String address;
     double salary;
 
-    public void printSalary() {
+    public void printDetails() {
+        System.out.println("\nOfficer Details:");
+        System.out.println("Name: " + name);
+        System.out.println("Age: " + age);
+        System.out.println("Phone Number: " + phoneNumber);
+        System.out.println("Address: " + address);
         System.out.println("Salary: " + salary);
+        
     }
 
     public void setEmployeeDetails() {
@@ -39,14 +45,9 @@ class Officer extends Employee {
     }
 
     public void printOfficerDetails() {
-        System.out.println("\nOfficer Details:");
-        System.out.println("Name: " + name);
-        System.out.println("Age: " + age);
-        System.out.println("Phone Number: " + phoneNumber);
-        System.out.println("Address: " + address);
-        System.out.println("Salary: " + salary);
+        printDetails();
         System.out.println("Specialization: " + specialization);
-        printSalary();
+        
     }
 }
 
@@ -62,13 +63,9 @@ class Manager extends Employee {
 
     public void printManagerDetails() {
         System.out.println("\nManager Details:");
-        System.out.println("Name: " + name);
-        System.out.println("Age: " + age);
-        System.out.println("Phone Number: " + phoneNumber);
-        System.out.println("Address: " + address);
-        System.out.println("Salary: " + salary);
+        printDetails();
         System.out.println("Department: " + department);
-        printSalary();
+        
     }
 }
 
